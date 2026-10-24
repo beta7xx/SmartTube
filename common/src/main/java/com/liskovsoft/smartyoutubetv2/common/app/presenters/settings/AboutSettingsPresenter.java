@@ -52,7 +52,7 @@ public class AboutSettingsPresenter extends BasePresenter<Void> {
 
         appendUpdateSource(settingsPresenter);
 
-        appendInstallBridge(settingsPresenter);
+        //appendInstallBridge(settingsPresenter); // downloads APK from repo owner's GitHub
 
         if (!Helpers.equalsAny(country, "RU", "UA")) {
             appendDonation(settingsPresenter);

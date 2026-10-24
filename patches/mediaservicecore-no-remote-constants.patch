@@ -1,0 +1,39 @@
+diff --git a/youtubeapi/src/main/java/com/liskovsoft/googlecommon/common/constants/ConstantsApi.kt b/youtubeapi/src/main/java/com/liskovsoft/googlecommon/common/constants/ConstantsApi.kt
+deleted file mode 100644
+index ce0c89d2..00000000
+--- a/youtubeapi/src/main/java/com/liskovsoft/googlecommon/common/constants/ConstantsApi.kt
++++ /dev/null
+@@ -1,12 +0,0 @@
+-package com.liskovsoft.googlecommon.common.constants
+-
+-import com.liskovsoft.googlecommon.common.constants.data.ConstantsResult
+-import com.liskovsoft.googlecommon.common.converters.gson.WithGson
+-import retrofit2.Call
+-import retrofit2.http.GET
+-
+-@WithGson
+-internal interface ConstantsApi {
+-    @GET("https://github.com/yuliskov/SmartTube/releases/download/latest/constants.json")
+-    fun getConstants(): Call<ConstantsResult?>
+-}
+\ No newline at end of file
+diff --git a/youtubeapi/src/main/java/com/liskovsoft/googlecommon/common/constants/ConstantsService.kt b/youtubeapi/src/main/java/com/liskovsoft/googlecommon/common/constants/ConstantsService.kt
+index be78b7fc..2d1af707 100644
+--- a/youtubeapi/src/main/java/com/liskovsoft/googlecommon/common/constants/ConstantsService.kt
++++ b/youtubeapi/src/main/java/com/liskovsoft/googlecommon/common/constants/ConstantsService.kt
+@@ -1,11 +1,9 @@
+ package com.liskovsoft.googlecommon.common.constants
+ 
+ import com.liskovsoft.googlecommon.common.constants.data.ConstantsResult
+-import com.liskovsoft.googlecommon.common.helpers.RetrofitHelper
+ 
+ internal object ConstantsService {
+-    private val mConstantsApi = RetrofitHelper.create(ConstantsApi::class.java)
+-
++    // Remote constants.json (repo owner's GitHub) disabled: GDrive backup and YouTube Data API key are unavailable
+     @JvmStatic
+-    val constants: ConstantsResult? by lazy { RetrofitHelper.get(mConstantsApi.getConstants()) }
+-}
+\ No newline at end of file
++    val constants: ConstantsResult? = null
++}

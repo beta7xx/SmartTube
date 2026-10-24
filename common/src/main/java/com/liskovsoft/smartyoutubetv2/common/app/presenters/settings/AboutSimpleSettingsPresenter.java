@@ -37,7 +37,7 @@ public class AboutSimpleSettingsPresenter extends BasePresenter<Void> {
 
         appendUpdateCheckButton(settingsPresenter);
 
-        appendInstallBridge(settingsPresenter);
+        //appendInstallBridge(settingsPresenter); // downloads APK from repo owner's GitHub
 
         settingsPresenter.showDialog(mainTitle);
     }
