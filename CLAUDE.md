@@ -69,6 +69,8 @@ When reviewing upstream merges, diff for new `http(s)://` strings. Exclude test 
 - DoH providers in `DohProviders.kt`.
 - `github.com/yt-dlp/ejs` – solver JS fallback, downloaded only when the built-in and cached copies are unusable; there is no hash check.
 
+Inbound listeners: `common/.../misc/DialServer.java` (DIAL casting, started from `RemoteControlService`). It is off by default (`RemoteControlData.isDialEnabled()`). When enabled, it listens on TCP 8090 and on UDP 1900 (the SSDP multicast port) on all interfaces, with no authentication. Anyone on the LAN can pair a YouTube sender and control playback, and they can read the device name and model. It is the only server socket in the app.
+
 Upstream-owner endpoints that are disabled or hidden in `main`:
 
 - `constants.json` – removed by the patch.
