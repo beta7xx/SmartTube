@@ -253,6 +253,8 @@ public class Utils {
         if (RemoteControlData.instance(context).isRemoteListeningEnabled()) {
             // Service that prevents the app from destroying
             startService(context, RemoteControlService.class);
+            // startService is a no-op if the service is already running, so the DIAL switch must be applied here
+            RemoteControlService.updateDialServer(context);
         } else {
             stopService(context, RemoteControlService.class);
         }

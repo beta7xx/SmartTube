@@ -52,7 +52,7 @@ public class RemoteControlService extends Service {
 
         PlaybackPresenter.instance(getApplicationContext()); // init RemoteControlListener
         StreamReminderService.instance(getApplicationContext()).startStop(); // init reminder service
-        updateDialServer();
+        updateDialServer(this);
 
         return START_STICKY;
     }
@@ -66,8 +66,8 @@ public class RemoteControlService extends Service {
     /**
      * DIAL makes the device show up in the cast dialog of YouTube apps on the same network.
      */
-    private void updateDialServer() {
-        Context context = getApplicationContext();
+    public static void updateDialServer(Context ctx) {
+        Context context = ctx.getApplicationContext();
         RemoteControlData data = RemoteControlData.instance(context);
         DialServer.startStop(data.isDialEnabled(), () -> new DialServer(
                 context,
