@@ -29,7 +29,7 @@ gradlew :smarttubetv:lintStfdroidDebug
 ```
 
 - **Flavors** (`smarttubetv/build.gradle`): `stbeta`, `ststable` and `stfdroid`. Firebase Crashlytics is applied only to `stbeta`/`ststable`. The update checker URLs are only in `common/src/stbeta|ststable/res/values/update_urls.xml`. Use **`stfdroid`** for personal builds.
-- **JDK:** the README says "OpenJDK 14 or older is required". In practice the build works on JDK 17. However, the Robolectric unit tests in `common` currently fail on JDK 17 with `NoClassDefFoundError: android/webkit/RoboCookieManager`. That is an environment problem, not a code regression.
+- **JDK:** use OpenJDK 17, the version the upstream CI builds with (`.github/workflows/CI.yml`). The Robolectric unit tests in `common` currently fail locally with `NoClassDefFoundError: android/webkit/RoboCookieManager`. That is an environment problem, not a code regression.
 - **Gradle:** the wrapper is Gradle 7.5 with `distributionSha256Sum` pinned. Gradle versions and SDK versions come from `SharedModules/constants.gradle`.
 - **Target TV:** a Sony BRAVIA on Android 9, 32-bit, so use the `armeabi-v7a` APK:
   ```
