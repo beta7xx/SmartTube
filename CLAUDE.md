@@ -14,8 +14,11 @@ SmartTube is an Android TV (leanback) YouTube client in Java with some Kotlin.
   git -C MediaServiceCore reset --hard
   git submodule update --init --recursive
   git -C MediaServiceCore apply ..\patches\mediaservicecore-no-remote-constants.patch
+  git -C MediaServiceCore apply ..\patches\mediaservicecore-plain-text-pairing-code.patch
   ```
-  If the patch is missing, the app goes back to fetching `constants.json` from the upstream owner's GitHub.
+- What each patch does:
+  - `mediaservicecore-no-remote-constants.patch` – stops fetching `constants.json` from the upstream owner's GitHub (and deletes the test for that fetch). If it is missing, the app fetches that file again.
+  - `mediaservicecore-plain-text-pairing-code.patch` – fixes "Add device" (link with TV code). YouTube's `get_pairing_code` endpoint answers in `text/plain`, but upstream parsed it as JSON (`$.code`) and got nothing. Drop this patch once upstream fixes it; it will then fail to apply.
 
 ## Build, install, test
 
@@ -29,7 +32,7 @@ gradlew :smarttubetv:lintStfdroidDebug
 ```
 
 - **Flavors** (`smarttubetv/build.gradle`): `stbeta`, `ststable` and `stfdroid`. Firebase Crashlytics is applied only to `stbeta`/`ststable`. The update checker URLs are only in `common/src/stbeta|ststable/res/values/update_urls.xml`. Use **`stfdroid`** for personal builds.
-- **JDK:** use OpenJDK 17, the version the upstream CI builds with (`.github/workflows/CI.yml`). The Robolectric unit tests in `common` currently fail locally with `NoClassDefFoundError: android/webkit/RoboCookieManager`. That is an environment problem, not a code regression.
+- **JDK:** use OpenJDK 17, the version the upstream CI builds with (`.github/workflows/CI.yml`). The Robolectric unit tests (`common` and `:youtubeapi`) can't run on it: Robolectric 4.6.1 can't read Java 17 class files (`Unsupported class file major version 61`, surfacing as `NoClassDefFoundError: android/webkit/RoboCookieManager`). This machine has only JDK 17, so verify changes on the TV instead. Many `:youtubeapi` tests also call the live YouTube API.
 - **Gradle:** the wrapper is Gradle 7.5 with `distributionSha256Sum` pinned. Gradle versions and SDK versions come from `SharedModules/constants.gradle`.
 - **Target TV:** a Sony BRAVIA on Android 9, 32-bit, so use the `armeabi-v7a` APK:
   ```

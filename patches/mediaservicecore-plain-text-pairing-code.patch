@@ -1,0 +1,112 @@
+diff --git a/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/BindManager.java b/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/BindManager.java
+index 151010e0..28ca95d2 100644
+--- a/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/BindManager.java
++++ b/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/BindManager.java
+@@ -20,5 +20,7 @@ public interface BindManager {
+                                      @Field("screen_id") String screenId,
+                                      @Field("screen_name") String screenName,
+                                      @Field("access_type") String accessType,
+-                                     @Field("app") String app);
++                                     @Field("app") String app,
++                                     @Field("device_id") String deviceId,
++                                     @Field("qr") String qr);
+ }
+diff --git a/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/InfoManager.java b/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/InfoManager.java
+index 7fe4cea7..200e8871 100644
+--- a/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/InfoManager.java
++++ b/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/InfoManager.java
+@@ -1,7 +1,6 @@
+ package com.liskovsoft.youtubeapi.lounge;
+ 
+ import com.liskovsoft.googlecommon.common.converters.jsonpath.WithJsonPath;
+-import com.liskovsoft.youtubeapi.lounge.models.info.PairingCodeV2;
+ import com.liskovsoft.youtubeapi.lounge.models.info.PlaylistInfo;
+ import com.liskovsoft.youtubeapi.lounge.models.info.TokenInfoList;
+ import retrofit2.Call;
+@@ -37,13 +36,4 @@ public interface InfoManager {
+                                    @Field("screen_name") String screenName,
+                                    @Field("device_id") String deviceId);
+ 
+-    @FormUrlEncoded
+-    @POST("https://www.youtube.com/api/lounge/pairing/get_pairing_code?ctx=pair")
+-    Call<PairingCodeV2> getPairingCodeV2(@Field("lounge_token") String loungeToken,
+-                                         @Field("screen_id") String screenId,
+-                                         @Field("screen_name") String screenName,
+-                                         @Field("access_type") String accessType,
+-                                         @Field("app") String app,
+-                                         @Field("device_id") String deviceId,
+-                                         @Field("qr") String qr);
+ }
+diff --git a/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/LoungeService.java b/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/LoungeService.java
+index e734f584..e2099bcf 100644
+--- a/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/LoungeService.java
++++ b/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/LoungeService.java
+@@ -12,7 +12,7 @@ import com.liskovsoft.youtubeapi.lounge.models.bind.ScreenId;
+ import com.liskovsoft.youtubeapi.lounge.models.commands.CommandItem;
+ import com.liskovsoft.youtubeapi.lounge.models.commands.CommandList;
+ import com.liskovsoft.youtubeapi.lounge.models.commands.PlaylistParams;
+-import com.liskovsoft.youtubeapi.lounge.models.info.PairingCodeV2;
++import com.liskovsoft.youtubeapi.lounge.models.bind.PairingCode;
+ import com.liskovsoft.youtubeapi.lounge.models.info.TokenInfo;
+ import com.liskovsoft.youtubeapi.lounge.models.info.TokenInfoList;
+ import com.liskovsoft.youtubeapi.service.internal.MediaServiceData;
+@@ -78,7 +78,7 @@ public class LoungeService {
+             return null;
+         }
+ 
+-        Call<PairingCodeV2> pairingCodeWrapper = mInfoManager.getPairingCodeV2(
++        Call<PairingCode> pairingCodeWrapper = mBindManager.getPairingCode(
+                 mLoungeToken,
+                 mScreenId,
+                 mScreenName,
+@@ -86,7 +86,7 @@ public class LoungeService {
+                 BindParams.APP,
+                 mDeviceId,
+                 BindParams.QR);
+-        PairingCodeV2 pairingCode = RetrofitHelper.get(pairingCodeWrapper);
++        PairingCode pairingCode = RetrofitHelper.get(pairingCodeWrapper);
+ 
+         mLoungeToken = null; // apply changes (restart the service)
+ 
+diff --git a/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/models/info/PairingCodeV2.java b/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/models/info/PairingCodeV2.java
+deleted file mode 100644
+index 6744407e..00000000
+--- a/youtubeapi/src/main/java/com/liskovsoft/youtubeapi/lounge/models/info/PairingCodeV2.java
++++ /dev/null
+@@ -1,23 +0,0 @@
+-package com.liskovsoft.youtubeapi.lounge.models.info;
+-
+-import com.liskovsoft.googlecommon.common.converters.jsonpath.JsonPath;
+-import com.liskovsoft.googlecommon.common.helpers.ServiceHelper;
+-
+-public class PairingCodeV2 {
+-    @JsonPath("$.code")
+-    private String mPairingCode;
+-    private String mPairingCodeAlt;
+-
+-    public String getPairingCode() {
+-        if (mPairingCode == null) {
+-            return null;
+-        }
+-
+-        // Format pairing code to XXX-XXX-XXX-XXX
+-        if (mPairingCodeAlt == null) {
+-            mPairingCodeAlt = ServiceHelper.insertSeparator(mPairingCode, " ", 3);
+-        }
+-
+-        return mPairingCodeAlt;
+-    }
+-}
+diff --git a/youtubeapi/src/test/java/com/liskovsoft/youtubeapi/lounge/BindManagerTest.java b/youtubeapi/src/test/java/com/liskovsoft/youtubeapi/lounge/BindManagerTest.java
+index c51188dd..42c3e088 100644
+--- a/youtubeapi/src/test/java/com/liskovsoft/youtubeapi/lounge/BindManagerTest.java
++++ b/youtubeapi/src/test/java/com/liskovsoft/youtubeapi/lounge/BindManagerTest.java
+@@ -61,7 +61,7 @@ public class BindManagerTest {
+     public void testThatPairingCodeGeneratedSuccessfully() {
+         TokenInfo screen = getScreen();
+         Call<PairingCode> pairingCodeWrapper = mBindManager.getPairingCode(screen.getLoungeToken(),
+-                screen.getScreenId(), SCREEN_NAME, BindParams.ACCESS_TYPE, BindParams.APP);
++                screen.getScreenId(), SCREEN_NAME, BindParams.ACCESS_TYPE, BindParams.APP, DEVICE_ID, BindParams.QR);
+         PairingCode pairingCode = RetrofitHelper.get(pairingCodeWrapper);
+ 
+         // Pairing code XXX-XXX-XXX-XXX
