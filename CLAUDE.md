@@ -14,11 +14,9 @@ SmartTube is an Android TV (leanback) YouTube client in Java with some Kotlin.
   git -C MediaServiceCore reset --hard
   git submodule update --init --recursive
   git -C MediaServiceCore apply ..\patches\mediaservicecore-no-remote-constants.patch
-  git -C MediaServiceCore apply ..\patches\mediaservicecore-plain-text-pairing-code.patch
   ```
-- What each patch does:
-  - `mediaservicecore-no-remote-constants.patch` – stops fetching `constants.json` from the upstream owner's GitHub (and deletes the test for that fetch). If it is missing, the app fetches that file again.
-  - `mediaservicecore-plain-text-pairing-code.patch` – fixes "Add device" (link with TV code). YouTube's `get_pairing_code` endpoint answers in `text/plain`, but upstream parsed it as JSON (`$.code`) and got nothing. Drop this patch once upstream fixes it; it will then fail to apply.
+  The patch stops fetching `constants.json` from the upstream owner's GitHub (and deletes the test for that fetch). If it is missing, the app fetches that file again.
+- A patch that stops applying after a merge usually means upstream changed the same code; check whether upstream fixed the problem itself before rewriting the patch.
 
 ## Build, install, test
 
