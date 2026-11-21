@@ -34,10 +34,10 @@ gradlew :smarttubetv:lintStfdroidDebug
 - **Gradle:** the wrapper is Gradle 7.5 with `distributionSha256Sum` pinned. Gradle versions and SDK versions come from `SharedModules/constants.gradle`.
 - **Target TV:** a Sony BRAVIA on Android 9, 32-bit, so use the `armeabi-v7a` APK:
   ```
-  adb connect 192.168.1.7:5555
+  adb connect 192.168.1.6:5555
   adb install -r <apk>
   ```
-  The user keeps ADB enabled on purpose. Debug builds are signed with `~/.android/debug.keystore`; `install -r` only works with that same key.
+  The TV's IP comes from DHCP and has changed before (192.168.1.7 until Nov 2026). If the connection fails, ask for the current IP. The user keeps ADB enabled on purpose. Debug builds are signed with `~/.android/debug.keystore`; `install -r` only works with that same key.
 
 ## Module layout
 
